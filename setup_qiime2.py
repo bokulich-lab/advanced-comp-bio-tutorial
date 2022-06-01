@@ -31,7 +31,8 @@ def cleanup():
 
 
 def run_and_check(
-        args, check, message, failure, success, console=con, env_vars=None
+        args, check, message, failure, success, console=con, env_vars=None,
+        check_returncode=True
 ):
     """Run a command and check that it worked."""
     console.log(message)
@@ -40,7 +41,9 @@ def run_and_check(
               universal_newlines=True)
     o, e = r.communicate()
     out = o + e
-    if r.returncode == 0 and check in out:
+
+    if (check_returncode and r.returncode == 0 and check in out) or \
+            (not check_returncode and check in out):
         console.log("[blue]%s[/blue]" % success)
     else:
         console.log("[red]%s[/red]" % failure, out)
@@ -151,32 +154,42 @@ if __name__ == "__main__":
             env_vars={"CONDA_PREFIX": "/usr/local"}
         )
 
+        # run_and_check(
+        #     ["vdb-config", "--restore-defaults"],
+        #     "Fixed default configuration",
+        #     ":mag: Fixing SRA Tools configuration :clock1:",
+        #     "could not configure SRA Tools :sob:",
+        #     ":mag: Done.",
+        #     env_vars={"CONDA_PREFIX": "/usr/local"}
+        # )
+
         run_and_check(
-            ["vdb-config", "--restore-defaults"],
-            "Fixed default configuration",
-            ":mag: Fixing SRA Tools configuration :clock1:",
+            ["vdb-config", "--root", "-s", "/repository/user/main/public/root=/content/prefetch_cache"],
+            "",
+            ":mag: Setting prefetch cache location :clock1:",
             "could not configure SRA Tools :sob:",
             ":mag: Done.",
             env_vars={"CONDA_PREFIX": "/usr/local"}
         )
 
-        # run_and_check(
-        #     ["vdb-config", "--root", "-s", "/repository/user/main/public/root=/content/prefetch_cache"],
-        #     "",
-        #     ":mag: Setting prefetch cache location :clock1:",
-        #     "could not configure SRA Tools :sob:",
-        #     ":mag: Done.",
-        #     env_vars={"CONDA_PREFIX": "/usr/local"}
-        # )
-        #
-        # run_and_check(
-        #     ["vdb-config", "--prefetch-to-user-repo"],
-        #     "will download to User Repository",
-        #     ":mag: Finalizing prefetch configuration :clock1:",
-        #     "could not configure SRA Tools :sob:",
-        #     ":mag: Done.",
-        #     env_vars={"CONDA_PREFIX": "/usr/local"}
-        # )
+        run_and_check(
+            ["vdb-config", "--prefetch-to-user-repo"],
+            "will download to User Repository",
+            ":mag: Finalizing prefetch configuration :clock1:",
+            "could not configure SRA Tools :sob:",
+            ":mag: Done.",
+            env_vars={"CONDA_PREFIX": "/usr/local"}
+        )
+
+        run_and_check(
+            ["vdb-config", "--interactive"],
+            "SIGNAL",
+            ":mag: Fixing SRA Tools configuration :clock1:",
+            "could not configure SRA Tools :sob:",
+            ":mag: Done.",
+            env_vars={"CONDA_PREFIX": "/usr/local"},
+            check_returncode=False
+        )
 
         run_and_check(
             ["jupyter", "serverextension", "enable",
