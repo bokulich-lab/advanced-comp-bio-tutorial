@@ -80,14 +80,6 @@ if __name__ == "__main__":
             "could not install miniconda :sob:",
             ":snake: Installed miniconda to `/usr/local` :snake:"
         )
-
-        # run_and_check(
-        #     ["conda", "install", "-y", "python=3.8"],
-        #     "Executing transaction",
-        #     ":snake: Changing python version to 3.8...",
-        #     "could not downgrade python :sob:",
-        #     ":snake: Python version updated to 3.8 :snake:"
-        # )
     else:
         con.log(":snake: Miniconda is already installed. Skipped.")
 
@@ -100,14 +92,6 @@ if __name__ == "__main__":
             "could not install mamba :sob:",
             ":mag: Done."
         )
-        #
-        # run_and_check(
-        #     ["wget", QIIME_YAML_URL],
-        #     "saved",
-        #     ":mag: Downloading QIIME 2 package list...",
-        #     "could not download package list :sob:",
-        #     ":mag: Done."
-        # )
 
         run_and_check(
             ["mamba", "env", "update", "-n", "base", "--file",
@@ -154,15 +138,6 @@ if __name__ == "__main__":
             env_vars={"CONDA_PREFIX": "/usr/local"}
         )
 
-        # run_and_check(
-        #     ["vdb-config", "--restore-defaults"],
-        #     "Fixed default configuration",
-        #     ":mag: Fixing SRA Tools configuration :clock1:",
-        #     "could not configure SRA Tools :sob:",
-        #     ":mag: Done.",
-        #     env_vars={"CONDA_PREFIX": "/usr/local"}
-        # )
-
         run_and_check(
             ["vdb-config", "--root", "-s", "/repository/user/main/public/root=/content/prefetch_cache"],
             "",
@@ -181,6 +156,8 @@ if __name__ == "__main__":
             env_vars={"CONDA_PREFIX": "/usr/local"}
         )
 
+        # this is a hack to make SRA tools work: this command fails but somehow
+        # still manages to configure the toolkit properly
         run_and_check(
             ["vdb-config", "--interactive"],
             "SIGNAL",
@@ -192,12 +169,11 @@ if __name__ == "__main__":
         )
 
         run_and_check(
-            ["jupyter", "serverextension", "enable",
-             "--py", "qiime2", "--sys-prefix"],
-            "qiime2.jupyter",
-            ":mag: Enabling QIIME2 Jupyter extension.\n :clock1:",
-            "could not enable the Jupyter extension :sob:",
-            ":mag: Done."
+            ["pip", "install", "empress"],
+            "Successfully installed empress-",
+            ":evergreen_tree: Installing Empress...",
+            "could not install Empress :sob:",
+            ":evergreen_tree: Done."
         )
     else:
         con.log(":mag: QIIME 2 is already installed. Skipped.")
@@ -208,6 +184,14 @@ if __name__ == "__main__":
         ":bar_chart: Checking that QIIME 2 command line works...",
         "QIIME 2 command line does not seem to work :sob:",
         ":bar_chart: QIIME 2 command line looks good :tada:"
+    )
+
+    run_and_check(
+        ["prefetch", "--help"],
+        "Usage: prefetch",
+        ":bar_chart: Checking that SRA Toolkit works...",
+        "SRA Toolkit does not seem to work :sob:",
+        ":bar_chart: SRA Toolkit looks good :tada:"
     )
 
     if sys.version_info[0:2] == (3, 8):
