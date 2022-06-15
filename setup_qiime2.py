@@ -113,6 +113,42 @@ if __name__ == "__main__":
         )
 
         run_and_check(
+            ["pip", "install", "redbiom"],
+            "Successfully installed",
+            ":mag: Installing redbiom. "
+            "This may take a little bit.\n :clock1:",
+            "could not install redbiom :sob:",
+            ":mag: Done."
+        )
+
+        run_and_check(
+            ["pip", "install", "q2-clawback"],
+            "Successfully installed",
+            ":mag: Installing q2-clawback. "
+            "This may take a little bit.\n :clock1:",
+            "could not install q2-clawback :sob:",
+            ":mag: Done."
+        )
+
+        run_and_check(
+            ["pip", "install", "git+https://github.com/bokulich-lab/RESCRIPt.git"],
+            "Successfully installed",
+            ":mag: Installing RESCRIPt. "
+            "This may take a little bit.\n :clock1:",
+            "could not install RESCRIPt :sob:",
+            ":mag: Done."
+        )
+
+        run_and_check(
+            ["pip", "install", "git+https://github.com/qiime2/provenance-lib.git"],
+            "Successfully installed",
+            ":mag: Installing provenance-lib. "
+            "This may take a little bit.\n :clock1:",
+            "could not install provenance-lib :sob:",
+            ":mag: Done."
+        )
+
+        run_and_check(
             ["wget", "--header", "Accept: application/vnd.github.v3.raw",
              "https://api.github.com/repos/bokulich-lab/q2-fondue/contents/install-sra-tools.sh"],
             "saved",
