@@ -16,15 +16,16 @@ has_conda = "conda version" in os.popen("conda info").read()
 has_qiime = "QIIME 2 release:" in os.popen("qiime info").read()
 
 
+MINICONDA_INSTALLER = "Miniconda3-py38_23.3.1-0-Linux-x86_64.sh"
 MINICONDA_PATH = (
-    "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+    f"https://repo.anaconda.com/miniconda/{MINICONDA_INSTALLER}"
 )
 
 
 def cleanup():
     """Remove downloaded files."""
-    if os.path.exists("Miniconda3-latest-Linux-x86_64.sh"):
-        os.remove("Miniconda3-latest-Linux-x86_64.sh")
+    if os.path.exists(MINICONDA_INSTALLER):
+        os.remove(MINICONDA_INSTALLER)
     if os.path.exists("install-sra-tools.sh"):
         os.remove("install-sra-tools.sh")
     con.log("Cleaned up unneeded files.")
@@ -74,7 +75,7 @@ if __name__ == "__main__":
         )
 
         run_and_check(
-            ["bash", "Miniconda3-latest-Linux-x86_64.sh", "-bfp", "/usr/local"],
+            ["bash", MINICONDA_INSTALLER, "-bfp", "/usr/local"],
             "installation finished.",
             ":snake: Installing miniconda...",
             "could not install miniconda :sob:",
@@ -94,21 +95,22 @@ if __name__ == "__main__":
         )
 
         run_and_check(
-            ["mamba", "env", "update", "-n", "base", "--file",
-             "environment.yml"],
-            "To activate this environment, use",
+            ["mamba", "install", "-n", "base", "-y",
+             "-c", "conda-forge", "-c", "bioconda", "-c", "qiime2",
+             "-c", "https://packages.qiime2.org/qiime2/2023.2/tested/",
+             "-c", "defaults",
+             "qiime2=2023.2", "q2cli", "q2templates", "q2-alignment",
+             "q2-composition", "q2-cutadapt", "q2-dada2", "q2-demux",
+             "q2-deblur", "q2-diversity", "q2-diversity-lib", "q2-emperor",
+             "q2-feature-classifier", "q2-feature-table",
+             "q2-fragment-insertion", "q2-gneiss", "q2-longitudinal",
+             "q2-metadata", "q2-mystery-stew", "q2-phylogeny",
+             "q2-quality-control", "q2-quality-filter", "q2-sample-classifier",
+             "q2-taxa", "q2-vsearch", "q2-fondue", "q2-types-genomics",
+             "ncbi-datasets-pylib", "pandas<2"],
+            "Executing transaction: ...working... done",
             ":mag: Installing QIIME 2. This may take a little bit.\n :clock1:",
             "could not install QIIME 2 :sob:",
-            ":mag: Done."
-        )
-
-        run_and_check(
-            ["pip", "install",
-             "git+https://github.com/bokulich-lab/q2-fondue.git@cb924d43d1c217342911fc5c2eaf136d4d283fa4"],
-            "Successfully installed",
-            ":mag: Installing required plugins. "
-            "This may take a little bit.\n :clock1:",
-            "could not install some QIIME 2 plugins :sob:",
             ":mag: Done."
         )
 
@@ -146,50 +148,6 @@ if __name__ == "__main__":
             "This may take a little bit.\n :clock1:",
             "could not install provenance-lib :sob:",
             ":mag: Done."
-        )
-
-        run_and_check(
-            ["wget", "--header", "Accept: application/vnd.github.v3.raw",
-             "https://api.github.com/repos/bokulich-lab/q2-fondue/contents/install-sra-tools.sh"],
-            "saved",
-            ":mag: Fetching SRA-Tools installation script :clock1:",
-            "could not fetch :sob:",
-            ":mag: Done."
-        )
-
-        run_and_check(
-            ["chmod", "+x", "install-sra-tools.sh"],
-            "",
-            ":mag: Adjusting script permissions :clock1:",
-            "could not change permissions :sob:",
-            ":mag: Done."
-        )
-
-        run_and_check(
-            ["bash", "install-sra-tools.sh"],
-            "Configuration completed",
-            ":mag: Installing SRA Tools :clock1:",
-            "could not install SRA Tools :sob:",
-            ":mag: Done.",
-            env_vars={"CONDA_PREFIX": "/usr/local"}
-        )
-
-        run_and_check(
-            ["vdb-config", "--root", "-s", "/repository/user/main/public/root=/content/prefetch_cache"],
-            "",
-            ":mag: Setting prefetch cache location :clock1:",
-            "could not configure SRA Tools :sob:",
-            ":mag: Done.",
-            env_vars={"CONDA_PREFIX": "/usr/local"}
-        )
-
-        run_and_check(
-            ["vdb-config", "--prefetch-to-user-repo"],
-            "will download to User Repository",
-            ":mag: Finalizing prefetch configuration :clock1:",
-            "could not configure SRA Tools :sob:",
-            ":mag: Done.",
-            env_vars={"CONDA_PREFIX": "/usr/local"}
         )
 
         # this is a hack to make SRA tools work: this command fails but somehow
